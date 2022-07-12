@@ -19,6 +19,11 @@ coin_selector = 'ETH'  # !UPDATE! To Crypto Ticker Wanted
 crypto_currencies = json['data']
 historial_data_eth = pd.read_csv(query_string)
 
+for specific_coin in crypto_currencies:
+    if specific_coin['symbol'] == coin_selector:
+        price = (specific_coin['quote']['USD']['price'])   
+         
+
 variance_values = historial_data_eth['Variance'] = historial_data_eth['Adj Close'] - (historial_data_eth['Adj Close'].mean())
 variance_array = []
 for index_of_variance, individual_variances in np.ndenumerate(variance_values):
@@ -38,10 +43,7 @@ annualized_volaility_divided_by_hundred = annualized_volitility_from_standard_de
 
 
 def coin_market_cap_crypto_calc():
-    for specific_coin in crypto_currencies:
-        if specific_coin['symbol'] == coin_selector:
-            price = (specific_coin['quote']['USD']['price'])   
-            
+   
     vt=annualized_volaility_divided_by_hundred*math.sqrt(time_to_maturity)
     lnpq=math.log(strike/price)
     d1= lnpq / vt
