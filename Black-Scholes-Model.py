@@ -3,8 +3,8 @@ from statistics import variance
 import requests
 import pandas as pd
 import numpy as np
-
-
+import time 
+start = time.time()
 url_coin_market_cap = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
 # !UPDATE QUERY! -daily for eth- 
 query_string = f'https://query1.finance.yahoo.com/v7/finance/download/ETH-USD?period1=1649635200&period2=1657497600&interval=1d&events=history&includeAdjustedClose=true' 
@@ -19,32 +19,37 @@ coin_selector = 'ETH'  # !UPDATE! To Crypto Ticker Wanted
 crypto_currencies = json['data']
 historial_data_eth = pd.read_csv(query_string)
 
-for specific_coin in crypto_currencies:
-    if specific_coin['symbol'] == coin_selector:
-        price = (specific_coin['quote']['USD']['price'])   
-         
+def update_standard_deviation():       
+    variance_values = historial_data_eth['Variance'] = (historial_data_eth['Adj Close'].mean()) - historial_data_eth['Adj Close'] 
+    variance_array = []
 
-variance_values = historial_data_eth['Variance'] = historial_data_eth['Adj Close'] - (historial_data_eth['Adj Close'].mean())
-variance_array = []
-for index_of_variance, individual_variances in np.ndenumerate(variance_values):
-    sqrt_abs_of_individual_variances = math.sqrt(abs(individual_variances))
-    variance_array.append(sqrt_abs_of_individual_variances)
+    for index_of_variance, individual_variances in np.ndenumerate(variance_values):
+        sqrt_abs_of_individual_variances = math.sqrt(abs(individual_variances))
+        variance_array.append(sqrt_abs_of_individual_variances)
    
-running_total_of_variances = 0
-running_sum_of_all_variances = 0
-for stripped_individual_variances in variance_array:
-    running_total_of_variances += 1
-    running_sum_of_all_variances  += stripped_individual_variances
+    running_total_of_variances = 0
+    running_sum_of_all_variances = 0
+    for stripped_individual_variances in variance_array:
+        running_total_of_variances += 1
+        running_sum_of_all_variances  += stripped_individual_variances
+        running_sum_of_all_variances, stripped_individual_variances
+        standard_deviation_from_variance = math.sqrt(running_sum_of_all_variances / running_total_of_variances) 
+    return standard_deviation_from_variance
 
-standard_deviation_from_variance = math.sqrt(running_sum_of_all_variances / running_total_of_variances) 
-annualized_volitility_from_standard_deviation = standard_deviation_from_variance * math.sqrt(365)
+updated_stddev = update_standard_deviation()
+annualized_volitility_from_standard_deviation = updated_stddev * math.sqrt(365)
 time_to_maturity = days_till_expiration / 365
-annualized_volaility_divided_by_hundred = annualized_volitility_from_standard_deviation / 100
+annualized_volaility = annualized_volitility_from_standard_deviation / 100
+
+def update_annualized_volitility_once_per_day():
+    return annualized_volaility
 
 
 def coin_market_cap_crypto_calc():
-   
-    vt=annualized_volaility_divided_by_hundred*math.sqrt(time_to_maturity)
+    for specific_coin in crypto_currencies:
+        if specific_coin['symbol'] == coin_selector:
+            price = (specific_coin['quote']['USD']['price']) 
+    vt=annualized_volaility*math.sqrt(time_to_maturity)
     lnpq=math.log(strike/price)
     d1= lnpq / vt
     y=math.floor(1/(1+.2316419* abs(d1))*100000)/100000
@@ -63,4 +68,8 @@ def coin_market_cap_crypto_calc():
     return pabove, pbelow 
 
 print(coin_market_cap_crypto_calc())
-  
+#print(update_annualized_volitility_once_per_day())
+
+end = time.time()
+total_time = end - start
+print("\n"+ str(total_time))
